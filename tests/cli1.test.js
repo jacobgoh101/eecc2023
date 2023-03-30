@@ -25,3 +25,8 @@ test('return error when input file has invalid format', async () => {
     const { stdout } = await execa('./cli1.js', ['--input=samples/challenge1/input3.txt']).catch(err => err);
     expect(stdout).toContain('Invalid input');
 });
+
+test('return error when input file has invalid offer codes', async () => {
+    const { stdout } = await execa('./cli1.js', ['--input=samples/challenge1/input3.txt']).catch(err => err);
+    expect(stdout).toContain('Invalid offer codes');
+});

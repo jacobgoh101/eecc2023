@@ -1,5 +1,7 @@
 
 const { inputSchema } = require('../schema/challenge1.schema');
+const { OfferService } = require('./offers.service');
+const uniq = require('lodash/uniq');
 
 class totalDeliveryCostExtimationService {
     static async parseAndValidateInput(input) {
@@ -40,6 +42,16 @@ class totalDeliveryCostExtimationService {
             return { pkgId, pkgWeight, distance, offerCode };
         });
 
+        // validate offerCode
+        let offerCodes = packages.map(p => p.offerCode);
+        offerCodes = uniq(offerCodes);
+        const validOfferCodes = await OfferService.getOffers();
+        const invalidOfferCodes = offerCodes.filter(offerCode => !validOfferCodes[offerCode]);
+        if (invalidOfferCodes.length) {
+            console.error(`Invalid offer codes: ${invalidOfferCodes.join(', ')}`);
+            return false;
+        }
+
         return {
             baseDeliveryCost, noOfPackages, packages: packages
         };
@@ -55,6 +67,7 @@ class totalDeliveryCostExtimationService {
         )
     }
 
+    static async calculateDeliveryCost(baseDeliveryCost, totalWeight, distance) { }
 }
 
 module.exports = { totalDeliveryCostExtimationService };
