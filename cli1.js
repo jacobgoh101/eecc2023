@@ -2,6 +2,7 @@
 'use strict';
 const meow = require('meow');
 const fs = require('fs');
+const { totalDeliveryCostExtimationService } = require('./services/challenge1.service');
 
 const cli = meow(`
     Usage
@@ -43,3 +44,10 @@ function readInputFile() {
 }
 
 const input = readInputFile();
+
+
+(async () => {
+    // validate input file
+    const valid = await totalDeliveryCostExtimationService.parseAndValidateInput(input);
+    console.log(`🚀 _ file: cli1.js:52 _ valid:`, valid);
+})()

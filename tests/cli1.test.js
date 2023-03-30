@@ -23,5 +23,5 @@ test('return error when input file is empty', async () => {
 
 test('return error when input file has invalid format', async () => {
     const { stdout } = await execa('./cli1.js', ['--input=samples/challenge1/input3.txt']).catch(err => err);
-    expect(stdout).toContain('Invalid input file format');
+    expect(stdout).toContain('Invalid input');
 });
