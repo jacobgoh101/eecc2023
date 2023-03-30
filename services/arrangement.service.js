@@ -5,8 +5,9 @@ const { CostExtimationService } = require("./cost-estimation.service");
 
 class ArrangementService {
   /**
+   * Parse and validate input string.
    *
-   * @param {*} input
+   * @param {string} input
    * @returns {Promise<{baseDeliveryCost: number, noOfPackages: number, packages: {pkgId: string, pkgWeight: number, distance: number, offerCode: string}[], noOfVehicles: number, maxSpeed: number, maxCarriableWeight: number}|false>}
    */
   static async parseAndValidateInput(input) {
@@ -93,6 +94,18 @@ class ArrangementService {
     );
   }
 
+  /**
+   * Process the delivery of packages based on the provided input data.
+   *
+   * @param {Object} params
+   * @param {number} params.baseDeliveryCost
+   * @param {Object[]} params.packages
+   * @param {number} params.maxCarriableWeight
+   * @param {number} params.maxSpeed
+   * @param {Object[]} params.vehicles
+   * @param {number} params.timeNow
+   * @returns {Promise<Object[]>}
+   */
   static async processDelivery({
     baseDeliveryCost,
     packages,
@@ -163,9 +176,10 @@ class ArrangementService {
   }
 
   /**
+   * Pick packages to be delivered based on the weight limit.
    *
-   * @param {*} arr
-   * @param {*} sumLimit
+   * @param {Object[]} arr
+   * @param {number} sumLimit
    * @returns {{pkgIds: string[]}}
    */
   static pickPackagesToBeDelivered(arr, sumLimit) {
@@ -208,7 +222,7 @@ class ArrangementService {
         if (
           maxSumElements.length === currentSumElements.length &&
           maxSum === currentSum &&
-          Math.max(...maxSumElements.map((d) => d.distance)) <
+          Math.max(...maxSumElements.map((d) => d.distance)) >
             Math.max(...currentSumElements.map((d) => d.distance))
         ) {
           maxSum = currentSum;
