@@ -2,11 +2,11 @@
 'use strict';
 const meow = require('meow');
 const fs = require('fs');
-const { CostExtimationService } = require('./services/challenge1.service');
+const { CostExtimationService } = require('./services/cost-estimation.service');
 
 const cli = meow(`
     Usage
-      $ eecc1 <input>
+      $ eecc-cost-estimation <input>
 
     Options
       --input, -i  Input file to process  [required]
@@ -17,7 +17,7 @@ const cli = meow(`
             ...
 
     Examples
-      $ eecc1 --input=foo.txt
+      $ eecc-cost-estimation --input=foo.txt
       pkgId1 discount1 total_cost1
 `, {
     flags: {

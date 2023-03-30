@@ -1,9 +1,8 @@
-const { arrangementInputSchame } = require('../schema/challenge1.schema');
-const { OfferService } = require('./offers.service');
+const { arrangementInputSchame } = require('../schema/validation.schema');
 const uniq = require('lodash/uniq');
 const maxBy = require('lodash/maxBy');
 const floor = require('lodash/floor');
-const { CostExtimationService } = require('./challenge1.service');
+const { CostExtimationService } = require('./cost-estimation.service');
 
 class ArrangementService {
     /**

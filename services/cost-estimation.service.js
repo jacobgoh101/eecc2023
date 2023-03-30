@@ -1,5 +1,5 @@
 
-const { costEstimationInputSchame } = require('../schema/challenge1.schema');
+const { costEstimationInputSchame } = require('../schema/validation.schema');
 const { OfferService } = require('./offers.service');
 const uniq = require('lodash/uniq');
 

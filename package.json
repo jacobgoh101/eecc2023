@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "A sample command line application for a courier service",
   "bin": {
-    "eecc1": "./cli1.js"
+    "eecc-cost-estimation": "./cli-cost-estimation.js",
+    "eecc-delivery-arrangement": "./cli-delivery-arrangement.js"
   },
   "scripts": {
     "test": "jest"

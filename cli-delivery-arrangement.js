@@ -2,12 +2,11 @@
 'use strict';
 const meow = require('meow');
 const fs = require('fs');
-const { ArrangementService } = require('./services/challenge2.service');
-const { CostExtimationService } = require('./services/challenge1.service');
+const { ArrangementService } = require('./services/arrangement.service');
 
 const cli = meow(`
     Usage
-      $ eecc2 <input>
+      $ eecc-delivery-arrangement <input>
 
     Options
       --input, -i  Input file to process  [required]
@@ -19,7 +18,7 @@ const cli = meow(`
             no_of_vehicles max_speed max_carriable_weight
 
     Examples
-      $ eecc2 --input=foo.txt
+      $ eecc-delivery-arrangement --input=foo.txt
       pkg_id1 discount1 total_cost1 estimated_delivery_time1_in_hours
       ...
 `, {
