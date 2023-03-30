@@ -3,7 +3,7 @@ const fs = require('fs');
 
 test('returns expected output based on Sample Input 1', async () => {
     const { stdout } = await execa('./cli1.js', ['--input=samples/challenge1/input1.txt']);
-    expect(stdout).toBe(fs.readFileSync('samples/challenge1/output1.txt', 'utf8'));
+    expect(stdout.trim()).toBe(fs.readFileSync('samples/challenge1/output1.txt', 'utf8').trim());
 });
 
 test('return error when input file is not specified', async () => {

@@ -4,6 +4,11 @@ const { OfferService } = require('./offers.service');
 const uniq = require('lodash/uniq');
 
 class totalDeliveryCostExtimationService {
+    /**
+     * 
+     * @param {*} input 
+     * @returns {Promise<{baseDeliveryCost: number, noOfPackages: number, packages: {pkgId: string, pkgWeight: number, distance: number, offerCode: string}[]}|false>}
+     */
     static async parseAndValidateInput(input) {
         if (!input?.trim()) {
             console.error('Input file is empty');
@@ -67,7 +72,32 @@ class totalDeliveryCostExtimationService {
         )
     }
 
-    static async calculateDeliveryCost(baseDeliveryCost, totalWeight, distance) { }
+    /**
+     * 
+     * @param {*} baseDeliveryCost 
+     * @param {*} totalWeight 
+     * @param {*} distance 
+     * @param {*} offerCode 
+     * @returns {Promise<{discount: number, totalCost: number}>}
+     */
+    static async calculateDeliveryCost(baseDeliveryCost, totalWeight, distance, offerCode) {
+        const offer = await OfferService.getOffer(offerCode);
+        if (!offer)
+            throw new Error(`Invalid offer code: ${offerCode}`);
+
+        //Base Delivery Cost + (Package Total Weight * 10) + (Distance to Destination * 5) = Total Delivery Cost
+        const totalDeliveryCost = baseDeliveryCost + (totalWeight * 10) + (distance * 5);
+
+        let discount = 0
+        if (totalWeight <= offer.weight.max && totalWeight >= offer.weight.min && distance <= offer.distance.max && distance >= offer.distance.min) {
+            discount = offer.discount * totalDeliveryCost
+        }
+
+        return {
+            discount: parseInt(discount), totalCost: parseInt(totalDeliveryCost - discount)
+        }
+
+    }
 }
 
 module.exports = { totalDeliveryCostExtimationService };

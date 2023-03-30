@@ -48,6 +48,17 @@ const input = readInputFile();
 
 (async () => {
     // validate input file
-    const valid = await totalDeliveryCostExtimationService.parseAndValidateInput(input);
-    console.log(`🚀 _ file: cli1.js:52 _ valid:`, valid);
+    const parsed = await totalDeliveryCostExtimationService.parseAndValidateInput(input);
+    if (!parsed) process.exit();
+    const {
+        baseDeliveryCost, noOfPackages, packages
+    } = parsed;
+    let result = '';
+    for (const { pkgId, pkgWeight, distance, offerCode } of packages) {
+        const { discount, totalCost } = await totalDeliveryCostExtimationService.calculateDeliveryCost(
+            baseDeliveryCost, pkgWeight, distance, offerCode
+        )
+        result += `${pkgId} ${discount} ${totalCost}\n`
+    }
+    console.log(result.trim());
 })()
