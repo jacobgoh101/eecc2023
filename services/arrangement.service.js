@@ -1,6 +1,5 @@
 const { arrangementInputSchame } = require('../schema/validation.schema');
 const uniq = require('lodash/uniq');
-const maxBy = require('lodash/maxBy');
 const floor = require('lodash/floor');
 const { CostExtimationService } = require('./cost-estimation.service');
 
@@ -95,7 +94,7 @@ class ArrangementService {
         if (!availableVehicle) {
             throw new Error('No vehicle available at this time');
         }
-        const { pkgIds: pckIdsToBeShippedNow } = this.maxWeightSum(
+        const { pkgIds: pckIdsToBeShippedNow } = this.pickPackagesToBeDelivered(
             pendingPackages, maxCarriableWeight
         )
         const pckToBeShippedNow = pendingPackages.filter((p, i) => pckIdsToBeShippedNow.includes(p.pkgId));
@@ -124,54 +123,60 @@ class ArrangementService {
         return this.processDelivery({ baseDeliveryCost, packages, maxCarriableWeight, maxSpeed, vehicles, timeNow: nextDeliveryTime });
     }
 
-    /**
-     * Finds the maximum weight sum, that is smaller or equal than sumLimit, of a contiguous subarray within the given array, using Kadane Algo
-     * @param {*} arr 
-     * @param {*} sumLimit 
-     * @param {*} startsFrom 
-     * @returns { sum: number, pkgIds: number[] }
-     */
-    static maxWeightSumStartsFrom(arr, sumLimit, startsFrom = 0) {
-        let maxSum = 0;
-        let maxSumPkgIds = [];
-        let currentSum = 0;
-        let currentSumPkgIds = [];
-        for (let i = startsFrom; i < arr.length; i++) {
-            if (currentSum + arr[i].pkgWeight > sumLimit) {
-                continue;
-            }
-            currentSum += arr[i].pkgWeight;
-            currentSumPkgIds.push(arr[i].pkgId);
-            if (currentSum > maxSum) {
-                maxSum = currentSum;
-                maxSumPkgIds = currentSumPkgIds;
-            }
-        }
-        return { sum: maxSum, pkgIds: maxSumPkgIds };
-    }
 
     /**
      * 
      * @param {*} arr 
      * @param {*} sumLimit 
-     * @returns { sum: number, pkgIds: number[] } the maximum sum, that is smaller or equal than sumLimit, of a subarray within the given array
+     * @param {*} startsFrom 
+     * @param {*} maxSum 
+     * @param {*} maxSumIndexes 
+     * @param {*} maxSumElements 
+     * @returns {{pkgIds: string[]}}
      */
-    static maxWeightSum(arr, sumLimit) {
-        // sort arr by pkgWeight, desc, because heavier packages should be shipped first
-        // sort arr by distance, asc, because packages with shorter distance should be shipped first
-        arr = arr.sort((a, b) => {
-            if (a.pkgWeight === b.pkgWeight) {
-                return a.distance - b.distance;
+    static pickPackagesToBeDelivered(arr, sumLimit, startsFrom = 0, maxSum = 0, maxSumIndexes = [], maxSumElements = []) {
+        let currentSum = 0
+        let currentSumIndexes = []
+        let currentSumElements = []
+        for (let i = startsFrom; i < arr.length; i++) {
+            if (currentSum + arr[i].pkgWeight > sumLimit) {
+                continue;
             }
-            return b.pkgWeight - a.pkgWeight;
-        });
-
-        const maxSums = [];
-        for (let i = 0; i < arr.length; i++) {
-            maxSums.push(this.maxWeightSumStartsFrom(arr, sumLimit, i));
+            currentSum += arr[i].pkgWeight;
+            currentSumIndexes.push(i);
+            currentSumElements.push(arr[i])
+            // Shipment should contain max packages vehicle can carry in a trip.
+            if (maxSumElements.length < currentSumElements.length) {
+                maxSum = currentSum;
+                maxSumIndexes = currentSumIndexes.slice();
+                maxSumElements = currentSumElements.slice();
+                continue;
+            }
+            // We should prefer heavier packages when there are multiple shipments with the same no. of packages.
+            if (maxSumElements.length === currentSumElements.length && maxSum < currentSum) {
+                maxSum = currentSum;
+                maxSumIndexes = currentSumIndexes.slice();
+                maxSumElements = currentSumElements.slice();
+                continue;
+            }
+            // If the weights are also the same, preference should be given to the shipment which can be delivered first.
+            if (
+                maxSumElements.length === currentSumElements.length &&
+                maxSum === currentSum &&
+                Math.max(...maxSumElements.map(d => d.distance)) < Math.max(...currentSumElements.map(d => d.distance))
+            ) {
+                maxSum = currentSum;
+                maxSumIndexes = currentSumIndexes.slice();
+                maxSumElements = currentSumElements.slice();
+                continue;
+            }
         }
-        return maxBy(maxSums, (maxSum) => maxSum.sum);
+        if (startsFrom === arr.length - 1) return {
+            pkgIds: maxSumElements.map(p => p.pkgId),
+        };
+        return this.pickPackagesToBeDelivered(arr, sumLimit, startsFrom + 1, maxSum, maxSumIndexes, maxSumElements);
     }
+
 }
 
 module.exports = { ArrangementService };
