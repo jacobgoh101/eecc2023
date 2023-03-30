@@ -63,7 +63,7 @@ class totalDeliveryCostExtimationService {
     }
 
     static logGeneralInvalidFormatError() {
-        console.log(
+        console.error(
             `Invalid input file format. The input file should be a text file in the format of:
                 baseDeliveryCost no_of_packges
                 pkgId1 pkgWeight1_in_kg distance1_in_km offerCode1

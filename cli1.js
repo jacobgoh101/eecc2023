@@ -38,7 +38,7 @@ function readInputFile() {
         const input = fs.readFileSync(cli.flags.input, 'utf8')
         return input;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         process.exit();
     }
 }

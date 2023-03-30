@@ -7,26 +7,41 @@ test('returns expected output based on Sample Input 1', async () => {
 });
 
 test('return error when input file is not specified', async () => {
-    const { stdout } = await execa('./cli1.js').catch(err => err);
-    expect(stdout).toContain('--input, -i  Input file to process  [required]');
+    const { stdout, stderr } = await execa('./cli1.js').catch(err => err);
+    expect(stdout || stderr).toContain('--input, -i  Input file to process  [required]');
 });
 
 test(`return error when input file doesn't exist`, async () => {
-    const { stdout } = await execa('./cli1.js', ['--input=foo.txt']).catch(err => err);
-    expect(stdout).toContain('ENOENT: no such file or directory');
+    const { stdout, stderr } = await execa('./cli1.js', ['--input=foo.txt']).catch(err => err);
+    expect(stdout || stderr).toContain('ENOENT: no such file or directory');
 })
 
 test('return error when input file is empty', async () => {
-    const { stdout } = await execa('./cli1.js', ['--input=samples/challenge1/input2.txt']).catch(err => err);
-    expect(stdout).toContain('Input file is empty');
+    const { stdout, stderr } = await execa('./cli1.js', ['--input=samples/challenge1/empty-input.txt']).catch(err => err);
+    expect(stdout || stderr).toContain('Input file is empty');
 });
 
-test('return error when input file has invalid format', async () => {
-    const { stdout } = await execa('./cli1.js', ['--input=samples/challenge1/input3.txt']).catch(err => err);
-    expect(stdout).toContain('Invalid input');
+test('return error when input file has invalid format 1', async () => {
+    const { stdout, stderr } = await execa('./cli1.js', ['--input=samples/challenge1/invalid-input-1.txt']).catch(err => err);
+    expect(stdout || stderr).toContain('Invalid input');
+});
+
+test('return error when input file has invalid format 2', async () => {
+    const { stdout, stderr } = await execa('./cli1.js', ['--input=samples/challenge1/invalid-input-2.txt']).catch(err => err);
+    expect(stdout || stderr).toContain('Invalid input');
+});
+
+test('return error when input file has invalid format 3', async () => {
+    const { stdout, stderr } = await execa('./cli1.js', ['--input=samples/challenge1/invalid-input-3.txt']).catch(err => err);
+    expect(stdout || stderr).toContain('Invalid input');
+});
+
+test('return error when input file has invalid format 4', async () => {
+    const { stdout, stderr } = await execa('./cli1.js', ['--input=samples/challenge1/invalid-input-4.txt']).catch(err => err);
+    expect(stdout || stderr).toContain('Invalid input');
 });
 
 test('return error when input file has invalid offer codes', async () => {
-    const { stdout } = await execa('./cli1.js', ['--input=samples/challenge1/input3.txt']).catch(err => err);
-    expect(stdout).toContain('Invalid offer codes');
+    const { stdout, stderr } = await execa('./cli1.js', ['--input=samples/challenge1/invalid-offer-input.txt']).catch(err => err);
+    expect(stdout || stderr).toContain('Invalid offer codes');
 });
