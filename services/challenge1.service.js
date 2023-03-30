@@ -57,6 +57,13 @@ class totalDeliveryCostExtimationService {
             return false;
         }
 
+        // validate unique pkgId
+        let pkgIds = packages.map(p => p.pkgId);
+        if (uniq(pkgIds).length !== pkgIds.length) {
+            console.error('Invalid input: pkgId must be unique');
+            return false;
+        }
+
         return {
             baseDeliveryCost, noOfPackages, packages: packages
         };
