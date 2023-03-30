@@ -12,6 +12,7 @@ This is a command line interface (CLI) app for a courier service, built using No
 ```bash
 git clone https://github.com/jacobgoh101/eecc2023
 cd eecc2023
+npm install
 npm install -g .
 ```
 
