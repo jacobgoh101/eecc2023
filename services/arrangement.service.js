@@ -95,10 +95,10 @@ class ArrangementService {
         if (!availableVehicle) {
             throw new Error('No vehicle available at this time');
         }
-        const { indexes: pckIndexesToBeShippedNow } = this.maxSum(
-            pendingPackages.map(p => p.pkgWeight), maxCarriableWeight
+        const { pkgIds: pckIdsToBeShippedNow } = this.maxWeightSum(
+            pendingPackages, maxCarriableWeight
         )
-        const pckToBeShippedNow = pendingPackages.filter((p, i) => pckIndexesToBeShippedNow.includes(i));
+        const pckToBeShippedNow = pendingPackages.filter((p, i) => pckIdsToBeShippedNow.includes(p.pkgId));
         for (let index = 0; index < pckToBeShippedNow.length; index++) {
             const p = pckToBeShippedNow[index];
             const deliveryTime = floor((p.distance / maxSpeed) + timeNow, 2);
@@ -125,41 +125,50 @@ class ArrangementService {
     }
 
     /**
-     * Finds the maximum sum, that is smaller or equal than sumLimit, of a contiguous subarray within the given array, using Kadane Algo
+     * Finds the maximum weight sum, that is smaller or equal than sumLimit, of a contiguous subarray within the given array, using Kadane Algo
      * @param {*} arr 
      * @param {*} sumLimit 
      * @param {*} startsFrom 
-     * @returns { sum: number, indexes: number[] }
+     * @returns { sum: number, pkgIds: number[] }
      */
-    static maxSumStartsFrom(arr, sumLimit, startsFrom = 0) {
+    static maxWeightSumStartsFrom(arr, sumLimit, startsFrom = 0) {
         let maxSum = 0;
-        let maxSumIndexes = [];
+        let maxSumPkgIds = [];
         let currentSum = 0;
-        let currentSumIndexes = [];
+        let currentSumPkgIds = [];
         for (let i = startsFrom; i < arr.length; i++) {
-            if (currentSum + arr[i] > sumLimit) {
+            if (currentSum + arr[i].pkgWeight > sumLimit) {
                 continue;
             }
-            currentSum += arr[i];
-            currentSumIndexes.push(i);
+            currentSum += arr[i].pkgWeight;
+            currentSumPkgIds.push(arr[i].pkgId);
             if (currentSum > maxSum) {
                 maxSum = currentSum;
-                maxSumIndexes = currentSumIndexes;
+                maxSumPkgIds = currentSumPkgIds;
             }
         }
-        return { sum: maxSum, indexes: maxSumIndexes };
+        return { sum: maxSum, pkgIds: maxSumPkgIds };
     }
 
     /**
      * 
      * @param {*} arr 
      * @param {*} sumLimit 
-     * @returns { sum: number, indexes: number[] } the maximum sum, that is smaller or equal than sumLimit, of a subarray within the given array
+     * @returns { sum: number, pkgIds: number[] } the maximum sum, that is smaller or equal than sumLimit, of a subarray within the given array
      */
-    static maxSum(arr, sumLimit) {
+    static maxWeightSum(arr, sumLimit) {
+        // sort arr by pkgWeight, desc, because heavier packages should be shipped first
+        // sort arr by distance, asc, because packages with shorter distance should be shipped first
+        arr = arr.sort((a, b) => {
+            if (a.pkgWeight === b.pkgWeight) {
+                return a.distance - b.distance;
+            }
+            return b.pkgWeight - a.pkgWeight;
+        });
+
         const maxSums = [];
         for (let i = 0; i < arr.length; i++) {
-            maxSums.push(this.maxSumStartsFrom(arr, sumLimit, i));
+            maxSums.push(this.maxWeightSumStartsFrom(arr, sumLimit, i));
         }
         return maxBy(maxSums, (maxSum) => maxSum.sum);
     }
