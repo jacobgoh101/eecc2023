@@ -30,10 +30,16 @@ const multiplePackageLinesValidator = (value, helpers) => {
     return value;
 };
 
-const inputSchema = Joi.object({
+const costEstimationInputSchame = Joi.object({
     baseDeliveryCost: Joi.number().positive().required(),
     noOfPackages: Joi.number().integer().positive().required(),
     packageLines: Joi.string().custom(multiplePackageLinesValidator).required(),
 });
 
-module.exports = { inputSchema };
+const arrangementInputSchame = costEstimationInputSchame.keys({
+    noOfVehicles: Joi.number().integer().positive().required(),
+    maxSpeed: Joi.number().positive().required(),
+    maxCarriableWeight: Joi.number().positive().required(),
+})
+
+module.exports = { costEstimationInputSchame, arrangementInputSchame };

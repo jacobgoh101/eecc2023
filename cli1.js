@@ -2,7 +2,7 @@
 'use strict';
 const meow = require('meow');
 const fs = require('fs');
-const { totalDeliveryCostExtimationService } = require('./services/challenge1.service');
+const { CostExtimationService } = require('./services/challenge1.service');
 
 const cli = meow(`
     Usage
@@ -48,14 +48,14 @@ const input = readInputFile();
 
 (async () => {
     // validate input file
-    const parsed = await totalDeliveryCostExtimationService.parseAndValidateInput(input);
+    const parsed = await CostExtimationService.parseAndValidateInput(input);
     if (!parsed) process.exit();
     const {
         baseDeliveryCost, noOfPackages, packages
     } = parsed;
     let result = '';
     for (const { pkgId, pkgWeight, distance, offerCode } of packages) {
-        const { discount, totalCost } = await totalDeliveryCostExtimationService.calculateDeliveryCost(
+        const { discount, totalCost } = await CostExtimationService.calculateDeliveryCost(
             baseDeliveryCost, pkgWeight, distance, offerCode
         )
         result += `${pkgId} ${discount} ${totalCost}\n`

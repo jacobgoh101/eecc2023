@@ -1,9 +1,9 @@
 
-const { inputSchema } = require('../schema/challenge1.schema');
+const { costEstimationInputSchame } = require('../schema/challenge1.schema');
 const { OfferService } = require('./offers.service');
 const uniq = require('lodash/uniq');
 
-class totalDeliveryCostExtimationService {
+class CostExtimationService {
     /**
      * 
      * @param {*} input 
@@ -15,7 +15,6 @@ class totalDeliveryCostExtimationService {
             return false;
         }
         let [header, ...packageLines] = input.trim().split('\n').map(s => s.trim()).filter(Boolean);
-        packageLines = packageLines.map(s => s.trim()).filter(Boolean);
 
         // validate header and package lines
         if (!header || !packageLines.length) {
@@ -30,7 +29,7 @@ class totalDeliveryCostExtimationService {
             return false;
         }
 
-        const validationResult = inputSchema.validate({
+        const validationResult = costEstimationInputSchame.validate({
             baseDeliveryCost,
             noOfPackages,
             packageLines: packageLines.join('\n'),
@@ -43,19 +42,11 @@ class totalDeliveryCostExtimationService {
 
         // parse packageLines input
         const packages = packageLines.map((line) => {
-            const [pkgId, pkgWeight, distance, offerCode] = line.split(' ').filter(Boolean);
+            let [pkgId, pkgWeight, distance, offerCode] = line.split(' ').filter(Boolean);
+            pkgWeight = +pkgWeight;
+            distance = +distance;
             return { pkgId, pkgWeight, distance, offerCode };
         });
-
-        // validate offerCode
-        let offerCodes = packages.map(p => p.offerCode);
-        offerCodes = uniq(offerCodes);
-        const validOfferCodes = await OfferService.getOffers();
-        const invalidOfferCodes = offerCodes.filter(offerCode => !validOfferCodes[offerCode]);
-        if (invalidOfferCodes.length) {
-            console.error(`Invalid offer codes: ${invalidOfferCodes.join(', ')}`);
-            return false;
-        }
 
         // validate unique pkgId
         let pkgIds = packages.map(p => p.pkgId);
@@ -89,14 +80,12 @@ class totalDeliveryCostExtimationService {
      */
     static async calculateDeliveryCost(baseDeliveryCost, totalWeight, distance, offerCode) {
         const offer = await OfferService.getOffer(offerCode);
-        if (!offer)
-            throw new Error(`Invalid offer code: ${offerCode}`);
 
         //Base Delivery Cost + (Package Total Weight * 10) + (Distance to Destination * 5) = Total Delivery Cost
         const totalDeliveryCost = baseDeliveryCost + (totalWeight * 10) + (distance * 5);
 
         let discount = 0
-        if (totalWeight <= offer.weight.max && totalWeight >= offer.weight.min && distance <= offer.distance.max && distance >= offer.distance.min) {
+        if (offer && totalWeight <= offer.weight.max && totalWeight >= offer.weight.min && distance <= offer.distance.max && distance >= offer.distance.min) {
             discount = offer.discount * totalDeliveryCost
         }
 
@@ -107,4 +96,4 @@ class totalDeliveryCostExtimationService {
     }
 }
 
-module.exports = { totalDeliveryCostExtimationService };
+module.exports = { CostExtimationService: CostExtimationService };

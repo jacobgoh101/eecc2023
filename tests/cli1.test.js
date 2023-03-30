@@ -51,7 +51,7 @@ test('return error when input file has invalid format 4', async () => {
     expect(stdout || stderr).toContain('Invalid input');
 });
 
-test('return error when input file has invalid offer codes', async () => {
+test('discount should be 0 when input file has invalid offer codes', async () => {
     const { stdout, stderr } = await execa('./cli1.js', ['--input=samples/challenge1/invalid-offer-input.txt']).catch(err => err);
-    expect(stdout || stderr).toContain('Invalid offer codes');
+    expect(stdout.trim()).toBe(fs.readFileSync('samples/challenge1/invalid-offer-output.txt', 'utf8').trim());
 });
