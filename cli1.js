@@ -12,13 +12,13 @@ const cli = meow(`
       --input, -i  Input file to process  [required]
         The input file should be a text file in the format of:
             
-            base_delivery_cost no_of_packges
-            pkg_id1 pkg_weight1_in_kg distance1_in_km offer_code1
+            baseDeliveryCost no_of_packges
+            pkgId1 pkgWeight1_in_kg distance1_in_km offerCode1
             ...
 
     Examples
       $ eecc1 --input=foo.txt
-      pkg_id1 discount1 total_cost1
+      pkgId1 discount1 total_cost1
 `, {
     flags: {
         input: {

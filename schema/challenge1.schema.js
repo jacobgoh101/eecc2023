@@ -1,25 +1,25 @@
 const Joi = require('joi');
 
 const packageSchema = Joi.object({
-    pkg_id: Joi.string().required(),
-    pkg_weight: Joi.number().positive().required(),
+    pkgId: Joi.string().required(),
+    pkgWeight: Joi.number().positive().required(),
     distance: Joi.number().positive().required(),
-    offer_code: Joi.string().required(),
+    offerCode: Joi.string().required(),
 });
 
 const multiplePackageLinesValidator = (value, helpers) => {
     const lines = value.trim().split('\n');
     for (const line of lines) {
-        const [pkg_id, pkg_weight, distance, offer_code, ...rest] = line.split(' ').filter(Boolean);
+        const [pkgId, pkgWeight, distance, offerCode, ...rest] = line.split(' ').filter(Boolean);
         if (rest.length) {
             return helpers.error('any.invalid');
         }
 
         const validationResult = packageSchema.validate({
-            pkg_id: (pkg_id),
-            pkg_weight: Number(pkg_weight),
+            pkgId: (pkgId),
+            pkgWeight: Number(pkgWeight),
             distance: Number(distance),
-            offer_code,
+            offerCode,
         });
 
         if (validationResult.error) {
@@ -31,9 +31,9 @@ const multiplePackageLinesValidator = (value, helpers) => {
 };
 
 const inputSchema = Joi.object({
-    base_delivery_cost: Joi.number().positive().required(),
-    no_of_packages: Joi.number().integer().positive().required(),
-    package_lines: Joi.string().custom(multiplePackageLinesValidator).required(),
+    baseDeliveryCost: Joi.number().positive().required(),
+    noOfPackages: Joi.number().integer().positive().required(),
+    packageLines: Joi.string().custom(multiplePackageLinesValidator).required(),
 });
 
 module.exports = { inputSchema };
