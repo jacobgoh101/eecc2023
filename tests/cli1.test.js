@@ -6,6 +6,16 @@ test('returns expected output based on Sample Input 1', async () => {
     expect(stdout.trim()).toBe(fs.readFileSync('samples/challenge1/output1.txt', 'utf8').trim());
 });
 
+test('returns expected output based on Sample Input 2', async () => {
+    const { stdout } = await execa('./cli1.js', ['--input=samples/challenge1/input2.txt']);
+    expect(stdout.trim()).toBe(fs.readFileSync('samples/challenge1/output2.txt', 'utf8').trim());
+});
+
+test('returns expected output based on Large Sample Input', async () => {
+    const { stdout, stderr } = await execa('./cli1.js', ['--input=samples/challenge1/input3.txt']);
+    expect(stdout.trim()).toBe(fs.readFileSync('samples/challenge1/output3.txt', 'utf8').trim());
+});
+
 test('return error when input file is not specified', async () => {
     const { stdout, stderr } = await execa('./cli1.js').catch(err => err);
     expect(stdout || stderr).toContain('--input, -i  Input file to process  [required]');

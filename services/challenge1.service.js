@@ -101,7 +101,7 @@ class totalDeliveryCostExtimationService {
         }
 
         return {
-            discount: parseInt(discount), totalCost: parseInt(totalDeliveryCost - discount)
+            discount: Number(discount.toFixed(2)), totalCost: Number((totalDeliveryCost - discount).toFixed(2))
         }
 
     }
