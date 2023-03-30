@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const meow = require('meow');
-
+const fs = require('fs');
 
 const cli = meow(`
     Usage
@@ -27,4 +27,19 @@ const cli = meow(`
     }
 });
 
-console.log(cli.flags.input);
+if (!cli.flags.input) {
+    cli.showHelp();
+    process.exit();
+}
+
+function readInputFile() {
+    try {
+        const input = fs.readFileSync(cli.flags.input, 'utf8')
+        return input;
+    } catch (err) {
+        console.log(err);
+        process.exit();
+    }
+}
+
+const input = readInputFile();
