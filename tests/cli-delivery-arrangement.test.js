@@ -10,6 +10,13 @@ test("returns expected output based on Sample Input 1", async () => {
   );
 });
 
+test("returns expected output based on large input", async () => {
+  const { stdout } = await execa("./cli-delivery-arrangement.js", [
+    "--input=samples/challenge2/input2.txt",
+  ]);
+  expect(stdout.trim()).toBeTruthy();
+});
+
 test("return error when input file is not specified", async () => {
   const { stdout, stderr } = await execa("./cli-delivery-arrangement.js").catch(
     (err) => err

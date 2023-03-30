@@ -166,72 +166,62 @@ class ArrangementService {
    *
    * @param {*} arr
    * @param {*} sumLimit
-   * @param {*} startsFrom
-   * @param {*} maxSum
-   * @param {*} maxSumIndexes
-   * @param {*} maxSumElements
    * @returns {{pkgIds: string[]}}
    */
-  static pickPackagesToBeDelivered(
-    arr,
-    sumLimit,
-    startsFrom = 0,
-    maxSum = 0,
-    maxSumIndexes = [],
-    maxSumElements = []
-  ) {
-    let currentSum = 0;
-    let currentSumIndexes = [];
-    let currentSumElements = [];
-    for (let i = startsFrom; i < arr.length; i++) {
-      if (currentSum + arr[i].pkgWeight > sumLimit) {
-        continue;
+  static pickPackagesToBeDelivered(arr, sumLimit) {
+    let currentSum = 0,
+      currentSumIndexes = [],
+      currentSumElements = [],
+      maxSum = 0,
+      maxSumIndexes = [],
+      maxSumElements = [],
+      startsFrom = 0;
+    while (startsFrom < arr.length) {
+      currentSum = 0;
+      currentSumIndexes = [];
+      currentSumElements = [];
+      for (let i = startsFrom; i < arr.length; i++) {
+        if (currentSum + arr[i].pkgWeight > sumLimit) {
+          continue;
+        }
+        currentSum += arr[i].pkgWeight;
+        currentSumIndexes.push(i);
+        currentSumElements.push(arr[i]);
+        // Shipment should contain max packages vehicle can carry in a trip.
+        if (maxSumElements.length < currentSumElements.length) {
+          maxSum = currentSum;
+          maxSumIndexes = currentSumIndexes.slice();
+          maxSumElements = currentSumElements.slice();
+          continue;
+        }
+        // We should prefer heavier packages when there are multiple shipments with the same no. of packages.
+        if (
+          maxSumElements.length === currentSumElements.length &&
+          maxSum < currentSum
+        ) {
+          maxSum = currentSum;
+          maxSumIndexes = currentSumIndexes.slice();
+          maxSumElements = currentSumElements.slice();
+          continue;
+        }
+        // If the weights are also the same, preference should be given to the shipment which can be delivered first.
+        if (
+          maxSumElements.length === currentSumElements.length &&
+          maxSum === currentSum &&
+          Math.max(...maxSumElements.map((d) => d.distance)) <
+            Math.max(...currentSumElements.map((d) => d.distance))
+        ) {
+          maxSum = currentSum;
+          maxSumIndexes = currentSumIndexes.slice();
+          maxSumElements = currentSumElements.slice();
+          continue;
+        }
       }
-      currentSum += arr[i].pkgWeight;
-      currentSumIndexes.push(i);
-      currentSumElements.push(arr[i]);
-      // Shipment should contain max packages vehicle can carry in a trip.
-      if (maxSumElements.length < currentSumElements.length) {
-        maxSum = currentSum;
-        maxSumIndexes = currentSumIndexes.slice();
-        maxSumElements = currentSumElements.slice();
-        continue;
-      }
-      // We should prefer heavier packages when there are multiple shipments with the same no. of packages.
-      if (
-        maxSumElements.length === currentSumElements.length &&
-        maxSum < currentSum
-      ) {
-        maxSum = currentSum;
-        maxSumIndexes = currentSumIndexes.slice();
-        maxSumElements = currentSumElements.slice();
-        continue;
-      }
-      // If the weights are also the same, preference should be given to the shipment which can be delivered first.
-      if (
-        maxSumElements.length === currentSumElements.length &&
-        maxSum === currentSum &&
-        Math.max(...maxSumElements.map((d) => d.distance)) <
-          Math.max(...currentSumElements.map((d) => d.distance))
-      ) {
-        maxSum = currentSum;
-        maxSumIndexes = currentSumIndexes.slice();
-        maxSumElements = currentSumElements.slice();
-        continue;
-      }
+      startsFrom++;
     }
-    if (startsFrom === arr.length - 1)
-      return {
-        pkgIds: maxSumElements.map((p) => p.pkgId),
-      };
-    return this.pickPackagesToBeDelivered(
-      arr,
-      sumLimit,
-      startsFrom + 1,
-      maxSum,
-      maxSumIndexes,
-      maxSumElements
-    );
+    return {
+      pkgIds: maxSumElements.map((p) => p.pkgId),
+    };
   }
 }
 
