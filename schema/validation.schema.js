@@ -18,7 +18,7 @@ const multiplePackageLinesValidator = (value, helpers) => {
     }
 
     const validationResult = packageSchema.validate({
-      pkgId: pkgId,
+      pkgId,
       pkgWeight: Number(pkgWeight),
       distance: Number(distance),
       offerCode,
@@ -32,16 +32,16 @@ const multiplePackageLinesValidator = (value, helpers) => {
   return value;
 };
 
-const costEstimationInputSchame = Joi.object({
+const costEstimationInputSchema = Joi.object({
   baseDeliveryCost: Joi.number().positive().required(),
   noOfPackages: Joi.number().integer().positive().required(),
   packageLines: Joi.string().custom(multiplePackageLinesValidator).required(),
 });
 
-const arrangementInputSchame = costEstimationInputSchame.keys({
+const arrangementInputSchema = costEstimationInputSchema.keys({
   noOfVehicles: Joi.number().integer().positive().required(),
   maxSpeed: Joi.number().positive().required(),
   maxCarriableWeight: Joi.number().positive().required(),
 });
 
-module.exports = { costEstimationInputSchame, arrangementInputSchame };
+module.exports = { costEstimationInputSchema, arrangementInputSchema };

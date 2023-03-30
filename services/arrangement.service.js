@@ -1,4 +1,4 @@
-const { arrangementInputSchame } = require("../schema/validation.schema");
+const { arrangementInputSchema } = require("../schema/validation.schema");
 const uniq = require("lodash/uniq");
 const floor = require("lodash/floor");
 const { CostExtimationService } = require("./cost-estimation.service");
@@ -41,7 +41,7 @@ class ArrangementService {
       return false;
     }
 
-    const validationResult = arrangementInputSchame.validate({
+    const validationResult = arrangementInputSchema.validate({
       baseDeliveryCost,
       noOfPackages,
       packageLines: packageLines.join("\n"),
