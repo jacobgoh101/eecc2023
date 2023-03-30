@@ -1,8 +1,10 @@
 {
   "name": "eecc",
   "version": "1.0.0",
-  "description": "A sample command line application",
-  "main": "index.js",
+  "description": "A sample command line application for a courier service",
+  "bin": {
+    "eecc1": "./cli1.js"
+  },
   "scripts": {
     "test": "test"
   },
@@ -15,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/jacobgoh101/eecc2023/issues"
   },
-  "homepage": "https://github.com/jacobgoh101/eecc2023#readme"
+  "homepage": "https://github.com/jacobgoh101/eecc2023#readme",
+  "dependencies": {
+    "meow": "^9.0.0"
+  }
 }
