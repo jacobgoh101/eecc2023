@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-'use strict';
-const meow = require('meow');
-const fs = require('fs');
-const { CostExtimationService } = require('./services/cost-estimation.service');
+"use strict";
+const meow = require("meow");
+const fs = require("fs");
+const { CostExtimationService } = require("./services/cost-estimation.service");
 
-const cli = meow(`
+const cli = meow(
+  `
     Usage
       $ eecc-cost-estimation <input>
 
@@ -19,46 +20,49 @@ const cli = meow(`
     Examples
       $ eecc-cost-estimation --input=foo.txt
       pkgId1 discount1 total_cost1
-`, {
+`,
+  {
     flags: {
-        input: {
-            type: 'string',
-            alias: 'i'
-        }
-    }
-});
+      input: {
+        type: "string",
+        alias: "i",
+      },
+    },
+  }
+);
 
 if (!cli.flags.input) {
-    cli.showHelp();
-    process.exit();
+  cli.showHelp();
+  process.exit();
 }
 
 function readInputFile() {
-    try {
-        const input = fs.readFileSync(cli.flags.input, 'utf8')
-        return input;
-    } catch (err) {
-        console.error(err);
-        process.exit();
-    }
+  try {
+    const input = fs.readFileSync(cli.flags.input, "utf8");
+    return input;
+  } catch (err) {
+    console.error(err);
+    process.exit();
+  }
 }
 
 const input = readInputFile();
 
-
 (async () => {
-    // validate input file
-    const parsed = await CostExtimationService.parseAndValidateInput(input);
-    if (!parsed) process.exit();
-    const {
-        baseDeliveryCost, noOfPackages, packages
-    } = parsed;
-    let result = '';
-    for (const { pkgId, pkgWeight, distance, offerCode } of packages) {
-        const { discount, totalCost } = await CostExtimationService.calculateDeliveryCost(
-            baseDeliveryCost, pkgWeight, distance, offerCode
-        )
-        result += `${pkgId} ${discount} ${totalCost}\n`
-    }
-    console.log(result.trim());
-})()
+  // validate input file
+  const parsed = await CostExtimationService.parseAndValidateInput(input);
+  if (!parsed) process.exit();
+  const { baseDeliveryCost, noOfPackages, packages } = parsed;
+  let result = "";
+  for (const { pkgId, pkgWeight, distance, offerCode } of packages) {
+    const { discount, totalCost } =
+      await CostExtimationService.calculateDeliveryCost(
+        baseDeliveryCost,
+        pkgWeight,
+        distance,
+        offerCode
+      );
+    result += `${pkgId} ${discount} ${totalCost}\n`;
+  }
+  console.log(result.trim());
+})();
