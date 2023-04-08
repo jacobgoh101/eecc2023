@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "offers",
-        "delivery arrangement"
+        "delivery arrangement",
+        "cost estimation"
     ]
 }
