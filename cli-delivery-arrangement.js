@@ -2,7 +2,10 @@
 "use strict";
 const meow = require("meow");
 const fs = require("fs");
-const { ArrangementService } = require("./services/arrangement.service");
+const {
+  ArrangementService,
+} = require("./services/arrangement/arrangement.service");
+const { ArrangementInputValidationService } = require("./services/arrangement/arrangement-input-validation.service");
 
 const cli = meow(
   `
@@ -52,7 +55,7 @@ const input = readInputFile();
 
 (async () => {
   // validate input file
-  const parsed = await ArrangementService.parseAndValidateInput(input);
+  const parsed = await ArrangementInputValidationService.parseAndValidateInput(input);
   if (!parsed) process.exit();
   let {
     baseDeliveryCost,
