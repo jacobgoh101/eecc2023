@@ -1,27 +1,11 @@
 const { OfferService } = require("../offers/offers.service");
 
 class CostExtimationService {
-  /**
-   *
-   * @param {*} baseDeliveryCost
-   * @param {*} totalWeight
-   * @param {*} distance
-   * @param {*} offerCode
-   * @returns {Promise<{discount: number, totalCost: number}>}
-   */
-  static async calculateDeliveryCost(
-    baseDeliveryCost,
-    totalWeight,
-    distance,
-    offerCode
-  ) {
-    const offer = await OfferService.getOffer(offerCode);
+  static calculateTotalDeliveryCost(baseDeliveryCost, totalWeight, distance) {
+    return baseDeliveryCost + totalWeight * 10 + distance * 5;
+  }
 
-    //Base Delivery Cost + (Package Total Weight * 10) + (Distance to Destination * 5) = Total Delivery Cost
-    const totalDeliveryCost =
-      baseDeliveryCost + totalWeight * 10 + distance * 5;
-
-    let discount = 0;
+  static async getDiscount(offer, totalDeliveryCost, totalWeight, distance) {
     if (
       offer &&
       totalWeight <= offer.weight.max &&
@@ -29,8 +13,29 @@ class CostExtimationService {
       distance <= offer.distance.max &&
       distance >= offer.distance.min
     ) {
-      discount = offer.discount * totalDeliveryCost;
+      return offer.discount * totalDeliveryCost;
     }
+    return 0;
+  }
+
+  static async calculateDeliveryCost(
+    baseDeliveryCost,
+    totalWeight,
+    distance,
+    offerCode
+  ) {
+    const offer = await OfferService.getOffer(offerCode);
+    const totalDeliveryCost = this.calculateTotalDeliveryCost(
+      baseDeliveryCost,
+      totalWeight,
+      distance
+    );
+    const discount = await this.getDiscount(
+      offer,
+      totalDeliveryCost,
+      totalWeight,
+      distance
+    );
 
     return {
       discount: Number(discount.toFixed(2)),
