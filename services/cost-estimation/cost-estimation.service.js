@@ -1,40 +1,32 @@
 const { OfferService } = require("../offers/offers.service");
+const { roundToPrecision } = require("../../utils/number.utils");
 
 class CostExtimationService {
-  /**
-   *
-   * @param {*} baseDeliveryCost
-   * @param {*} totalWeight
-   * @param {*} distance
-   * @param {*} offerCode
-   * @returns {Promise<{discount: number, totalCost: number}>}
-   */
+  static calculateTotalDeliveryCost(baseDeliveryCost, totalWeight, distance) {
+    return baseDeliveryCost + totalWeight * 10 + distance * 5;
+  }
+
   static async calculateDeliveryCost(
     baseDeliveryCost,
     totalWeight,
     distance,
     offerCode
   ) {
-    const offer = await OfferService.getOffer(offerCode);
-
-    //Base Delivery Cost + (Package Total Weight * 10) + (Distance to Destination * 5) = Total Delivery Cost
-    const totalDeliveryCost =
-      baseDeliveryCost + totalWeight * 10 + distance * 5;
-
-    let discount = 0;
-    if (
-      offer &&
-      totalWeight <= offer.weight.max &&
-      totalWeight >= offer.weight.min &&
-      distance <= offer.distance.max &&
-      distance >= offer.distance.min
-    ) {
-      discount = offer.discount * totalDeliveryCost;
-    }
+    const totalDeliveryCost = this.calculateTotalDeliveryCost(
+      baseDeliveryCost,
+      totalWeight,
+      distance
+    );
+    const discount = await OfferService.getDiscount(
+      offerCode,
+      totalDeliveryCost,
+      totalWeight,
+      distance
+    );
 
     return {
-      discount: Number(discount.toFixed(2)),
-      totalCost: Number((totalDeliveryCost - discount).toFixed(2)),
+      discount: roundToPrecision(discount),
+      totalCost: roundToPrecision(totalDeliveryCost - discount),
     };
   }
 }
