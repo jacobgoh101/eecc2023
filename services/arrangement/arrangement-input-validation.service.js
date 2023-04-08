@@ -3,6 +3,79 @@ const uniq = require("lodash/uniq");
 
 class ArrangementInputValidationService {
   /**
+   * Parse input string.
+   *
+   * @param {string} input
+   * @returns {Promise<{baseDeliveryCost: number, noOfPackages: number, packages: {pkgId: string, pkgWeight: number, distance: number, offerCode: string}[], noOfVehicles: number, maxSpeed: number, maxCarriableWeight: number}|false>}
+   */
+  static async parseInput(input) {
+    const inputStrings = input
+      .trim()
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const header = inputStrings.shift();
+    const footer = inputStrings.pop();
+    const packageLines = inputStrings;
+
+    const [baseDeliveryCost, noOfPackages] = header.split(" ").map(Number);
+    const [noOfVehicles, maxSpeed, maxCarriableWeight] = footer
+      .split(" ")
+      .map(Number);
+
+    const packages = packageLines.map((line) => {
+      let [pkgId, pkgWeight, distance, offerCode] = line
+        .split(" ")
+        .filter(Boolean);
+      pkgWeight = +pkgWeight;
+      distance = +distance;
+      return { pkgId, pkgWeight, distance, offerCode };
+    });
+
+    return {
+      baseDeliveryCost,
+      noOfPackages,
+      packages,
+      noOfVehicles,
+      maxSpeed,
+      maxCarriableWeight,
+    };
+  }
+
+  /**
+   * Validate parsed input.
+   *
+   * @param {object} parsedInput
+   * @returns {boolean}
+   */
+  static validateInput(parsedInput) {
+    const { noOfPackages, packages } = parsedInput;
+
+    // validate noOfPackages
+    if (noOfPackages !== packages.length) {
+      console.error(
+        "Invalid input: noOfPackages does not match the number of package lines"
+      );
+      return false;
+    }
+
+    const validationResult = arrangementInputSchema.validate(parsedInput);
+
+    if (validationResult.error) {
+      console.error("Invalid input:", validationResult.error.message);
+      return false;
+    }
+
+    let pkgIds = packages.map((p) => p.pkgId);
+    if (uniq(pkgIds).length !== pkgIds.length) {
+      console.error("Invalid input: pkgId must be unique");
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Parse and validate input string.
    *
    * @param {string} input
@@ -13,72 +86,15 @@ class ArrangementInputValidationService {
       console.error("Input file is empty");
       return false;
     }
-    const inputStrings = input
-      .trim()
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    const header = inputStrings.shift();
-    const footer = inputStrings.pop();
-    const packageLines = inputStrings;
 
-    // validate header and package lines
-    if (!header || !footer || !packageLines.length) {
+    const parsedInput = await this.parseInput(input);
+
+    if (!this.validateInput(parsedInput)) {
       this.logGeneralInvalidFormatError();
       return false;
     }
-    const [baseDeliveryCost, noOfPackages] = header.split(" ").map(Number);
-    const [noOfVehicles, maxSpeed, maxCarriableWeight] = footer
-      .split(" ")
-      .map(Number);
 
-    // validate noOfPackages
-    if (noOfPackages !== packageLines.length) {
-      console.error(
-        "Invalid input: noOfPackages does not match the number of package lines"
-      );
-      return false;
-    }
-
-    const validationResult = arrangementInputSchema.validate({
-      baseDeliveryCost,
-      noOfPackages,
-      packageLines: packageLines.join("\n"),
-      noOfVehicles,
-      maxSpeed,
-      maxCarriableWeight,
-    });
-
-    if (validationResult.error) {
-      console.error("Invalid input:", validationResult.error.message);
-      return false;
-    }
-
-    // parse packageLines input
-    const packages = packageLines.map((line) => {
-      let [pkgId, pkgWeight, distance, offerCode] = line
-        .split(" ")
-        .filter(Boolean);
-      pkgWeight = +pkgWeight;
-      distance = +distance;
-      return { pkgId, pkgWeight, distance, offerCode };
-    });
-
-    // validate unique pkgId
-    let pkgIds = packages.map((p) => p.pkgId);
-    if (uniq(pkgIds).length !== pkgIds.length) {
-      console.error("Invalid input: pkgId must be unique");
-      return false;
-    }
-
-    return {
-      baseDeliveryCost,
-      noOfPackages,
-      packages,
-      noOfVehicles,
-      maxSpeed,
-      maxCarriableWeight,
-    };
+    return parsedInput;
   }
 
   static logGeneralInvalidFormatError() {

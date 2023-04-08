@@ -6,7 +6,7 @@ const {
   CostExtimationService,
 } = require("./services/cost-estimation/cost-estimation.service");
 const {
-  CostExtimationInputValidationService,
+  CostEstimationInputValidationService,
 } = require("./services/cost-estimation/cost-extimation-input-validation.service");
 
 const cli = meow(
@@ -56,7 +56,7 @@ const input = readInputFile();
 (async () => {
   // validate input file
   const parsed =
-    await CostExtimationInputValidationService.parseAndValidateInput(input);
+    await CostEstimationInputValidationService.parseAndValidateInput(input);
   if (!parsed) process.exit();
   const { baseDeliveryCost, noOfPackages, packages } = parsed;
   let result = "";
