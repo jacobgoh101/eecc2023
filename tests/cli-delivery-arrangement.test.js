@@ -26,6 +26,15 @@ test("returns expected output based on Sample Input, where packages with shorter
   );
 });
 
+test("returns expected output based on Sample Input, where the last and 2nd last items are similar but the last item should be selected", async () => {
+  const { stdout } = await execa("./cli-delivery-arrangement.js", [
+    "--input=samples/challenge2/input4.txt",
+  ]);
+  expect(stdout.trim()).toBe(
+    fs.readFileSync("samples/challenge2/output4.txt", "utf8").trim()
+  );
+});
+
 test("return error when input file is not specified", async () => {
   const { stdout, stderr } = await execa("./cli-delivery-arrangement.js").catch(
     (err) => err
