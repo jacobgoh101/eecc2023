@@ -14,6 +14,7 @@ class CostEstimationInputValidationService {
       .split("\n")
       .map((s) => s.trim())
       .filter(Boolean);
+    header = header ?? "";
 
     const [baseDeliveryCost, noOfPackages] = header.split(" ").map(Number);
 
@@ -53,7 +54,7 @@ class CostEstimationInputValidationService {
     const validationResult = costEstimationInputSchema.validate(parsedInput);
 
     if (validationResult.error) {
-      console.error("Invalid input:", validationResult.error.message);
+      console.error("Invalid input:" + validationResult.error.message);
       return false;
     }
 

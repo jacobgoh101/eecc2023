@@ -14,8 +14,8 @@ class ArrangementInputValidationService {
       .split("\n")
       .map((s) => s.trim())
       .filter(Boolean);
-    const header = inputStrings.shift();
-    const footer = inputStrings.pop();
+    const header = inputStrings.shift() ?? "";
+    const footer = inputStrings.pop() ?? "";
     const packageLines = inputStrings;
 
     const [baseDeliveryCost, noOfPackages] = header.split(" ").map(Number);
@@ -62,7 +62,7 @@ class ArrangementInputValidationService {
     const validationResult = arrangementInputSchema.validate(parsedInput);
 
     if (validationResult.error) {
-      console.error("Invalid input:", validationResult.error.message);
+      console.error("Invalid input:" + validationResult.error.message);
       return false;
     }
 
