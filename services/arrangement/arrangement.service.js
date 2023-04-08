@@ -93,6 +93,7 @@ class ArrangementService {
    * @returns {{pkgIds: string[]}}
    */
   static pickPackagesToBeDelivered(packages, sumLimit) {
+    if (!packages.length) return { pkgIds: [] };
     const packageWeightArray = packages.map((p) => p.pkgWeight);
     const packagePriorityScoreArray = packages.map((pkg) =>
       this.getPackagePriorityScore(pkg)
