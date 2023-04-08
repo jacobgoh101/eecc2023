@@ -1,4 +1,5 @@
 const { OfferService } = require("../offers/offers.service");
+const { roundToPrecision } = require("../../utils/number.utils");
 
 class CostExtimationService {
   static calculateTotalDeliveryCost(baseDeliveryCost, totalWeight, distance) {
@@ -24,8 +25,8 @@ class CostExtimationService {
     );
 
     return {
-      discount: Number(discount.toFixed(2)),
-      totalCost: Number((totalDeliveryCost - discount).toFixed(2)),
+      discount: roundToPrecision(discount),
+      totalCost: roundToPrecision(totalDeliveryCost - discount),
     };
   }
 }
