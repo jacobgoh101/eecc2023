@@ -2,7 +2,12 @@
 "use strict";
 const meow = require("meow");
 const fs = require("fs");
-const { CostExtimationService } = require("./services/cost-estimation.service");
+const {
+  CostExtimationService,
+} = require("./services/cost-estimation/cost-estimation.service");
+const {
+  CostEstimationInputValidationService,
+} = require("./services/cost-estimation/cost-extimation-input-validation.service");
 
 const cli = meow(
   `
@@ -50,7 +55,8 @@ const input = readInputFile();
 
 (async () => {
   // validate input file
-  const parsed = await CostExtimationService.parseAndValidateInput(input);
+  const parsed =
+    await CostEstimationInputValidationService.parseAndValidateInput(input);
   if (!parsed) process.exit();
   const { baseDeliveryCost, noOfPackages, packages } = parsed;
   let result = "";
